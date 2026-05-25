@@ -65,14 +65,21 @@
                 </div>
             </div>
             
-            <div class="space-y-4 mb-8">
-                <div class="flex justify-between items-center p-3 bg-dark-800/50 rounded-lg border border-dark-700">
-                    <span class="text-gray-400 text-sm"><i class="fa-solid fa-anchor w-5"></i> Origin</span>
-                    <span class="text-white font-medium">Vitoria, Brazil (BRVIT)</span>
+            <div class="grid grid-cols-2 gap-3 mb-4">
+                <div class="p-3 bg-dark-800/50 rounded-lg border border-dark-700">
+                    <span class="text-gray-400 text-[10px] uppercase tracking-wider block mb-1"><i class="fa-regular fa-calendar text-brand-500"></i> Loading Window</span>
+                    <span class="text-white text-sm font-semibold">Oct 12 - 15, 2026</span>
                 </div>
+                <div class="p-3 bg-dark-800/50 rounded-lg border border-dark-700">
+                    <span class="text-gray-400 text-[10px] uppercase tracking-wider block mb-1"><i class="fa-solid fa-anchor text-blue-500"></i> Est. Arrival (Rotterdam)</span>
+                    <span class="text-white text-sm font-semibold">Nov 02, 2026</span>
+                </div>
+            </div>
+
+            <div class="space-y-2 mb-6">
                 <div class="flex justify-between items-center p-3 bg-dark-800/50 rounded-lg border border-dark-700">
-                    <span class="text-gray-400 text-sm"><i class="fa-solid fa-map-pin w-5"></i> Destination</span>
-                    <span class="text-white font-medium">Rotterdam, NL (NLRTM)</span>
+                    <span class="text-gray-400 text-sm"><i class="fa-solid fa-route w-5"></i> Route</span>
+                    <span class="text-white font-medium text-sm">Vitoria (BR) &rarr; Rotterdam (NL)</span>
                 </div>
                 <div class="flex justify-between items-center p-3 bg-dark-800/50 rounded-lg border border-dark-700">
                     <span class="text-gray-400 text-sm"><i class="fa-solid fa-leaf w-5"></i> Compliance</span>
@@ -91,13 +98,25 @@
                     </div>
                 </div>
                 <div class="flex justify-between text-xs text-gray-400">
-                    <span>18 Tons Booked</span>
-                    <span>6 Tons Available (Your Est. Yield: 3.1t)</span>
+                    <span>18,000 kg Booked</span>
+                    <span class="font-bold text-white">6,000 kg Available</span>
+                </div>
+            </div>
+
+            <!-- Dynamic Pricing Element -->
+            <div class="mt-4 p-4 bg-brand-500/10 border border-brand-500/30 rounded-lg flex justify-between items-center mb-6">
+                <div>
+                    <span class="text-brand-400 text-[10px] uppercase tracking-wider block font-bold mb-1"><i class="fa-solid fa-bolt text-amber-400 mr-1"></i> Dynamic Freight Rate</span>
+                    <span class="text-2xl font-bold text-white">$0.14 <span class="text-sm font-normal text-gray-400">/ kg</span></span>
+                </div>
+                <div class="text-right">
+                    <span class="text-gray-400 text-xs block mb-1">Your Est. Yield</span>
+                    <span class="text-white font-medium">3,100 kg</span>
+                    <div class="text-[10px] text-gray-400 mt-0.5">Est. Cost: <span class="text-white font-semibold">$434.00</span></div>
                 </div>
             </div>
 
             <div class="pt-4 border-t border-dark-700">
-                <p class="text-xs text-gray-400 mb-4 text-center">Consolidating shipments reduces carbon footprint by an estimated 22%.</p>
                 <button onclick="toggleModal()" class="w-full bg-brand-600 hover:bg-brand-500 text-white font-bold py-3 px-4 rounded-lg transition-colors shadow-[0_0_15px_rgba(16,185,129,0.3)] hover:shadow-[0_0_25px_rgba(16,185,129,0.5)]">
                     Secure Remaining Space
                 </button>
@@ -277,13 +296,17 @@
                     </div>
                     <div class="relative z-10 h-full flex flex-col justify-between">
                         <div>
-                            <span class="inline-block px-2 py-1 bg-blue-500/20 text-blue-400 text-[10px] font-bold uppercase rounded mb-2 border border-blue-500/20">Logistics</span>
+                            <span class="inline-block px-2 py-1 bg-blue-500/20 text-blue-400 text-[10px] font-bold uppercase rounded mb-3 border border-blue-500/20">Logistics Hub</span>
                             <h2 class="text-xl font-bold text-white mb-1">Join Shipment #BR-RT-892</h2>
-                            <p class="text-sm text-gray-400 mb-6">Consolidated 20ft Container &bull; Vitoria Port to Rotterdam</p>
+                            
+                            <div class="flex items-center gap-3 text-xs text-gray-400 mb-5">
+                                <span class="bg-dark-900/80 px-2 py-1 rounded"><i class="fa-regular fa-calendar text-brand-500 mr-1"></i> Departs Oct 15</span>
+                                <span class="bg-dark-900/80 px-2 py-1 rounded border border-brand-500/20 text-brand-400 font-semibold"><i class="fa-solid fa-tag mr-1"></i> $0.14 / kg</span>
+                            </div>
                             
                             <div class="mb-2 flex justify-between text-sm font-medium">
-                                <span class="text-gray-300">Container Capacity</span>
-                                <span class="text-brand-400">75% Full</span>
+                                <span class="text-gray-300">Remaining Capacity</span>
+                                <span class="text-brand-400 font-bold">6,000 kg</span>
                             </div>
                             <div class="w-full bg-dark-900 rounded-full h-3 mb-1 border border-dark-700 overflow-hidden relative">
                                 <div class="bg-brand-500 h-3 rounded-full relative" style="width: 75%">
@@ -291,14 +314,14 @@
                                 </div>
                             </div>
                             <div class="flex justify-between text-[10px] text-gray-500">
-                                <span>0 Tons</span>
-                                <span>18 / 24 Tons Booked</span>
+                                <span>18,000 kg Booked</span>
+                                <span>24,000 kg Total Container</span>
                             </div>
                         </div>
                         
                         <!-- Added toggleModal() onClick handler -->
-                        <button onclick="toggleModal()" class="w-full mt-6 bg-brand-600 hover:bg-brand-500 text-white font-medium py-3 rounded-lg transition-colors shadow-[0_0_15px_rgba(16,185,129,0.3)] hover:shadow-[0_0_25px_rgba(16,185,129,0.5)]">
-                            Reserve Remaining Space
+                        <button onclick="toggleModal()" class="w-full mt-6 bg-brand-600 hover:bg-brand-500 text-white font-medium py-3 rounded-lg transition-colors shadow-[0_0_15px_rgba(16,185,129,0.3)] hover:shadow-[0_0_25px_rgba(16,185,129,0.5)] flex justify-center items-center">
+                            Reserve Remaining Space <i class="fa-solid fa-arrow-right ml-2 text-sm"></i>
                         </button>
                     </div>
                 </div>
