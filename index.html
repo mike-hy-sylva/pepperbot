@@ -1,0 +1,340 @@
+<!DOCTYPE html>
+<html lang="en" class="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PepperBot | Enterprise Farm Intelligence</title>
+    
+    <!-- Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    fontFamily: { sans: ['Inter', 'sans-serif'] },
+                    colors: {
+                        brand: { 50: '#ecfdf5', 100: '#d1fae5', 500: '#10b981', 600: '#059669', 900: '#064e3b' },
+                        dark: { 900: '#0f172a', 800: '#1e293b', 700: '#334155' }
+                    }
+                }
+            }
+        }
+    </script>
+
+    <!-- FontAwesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <!-- Leaflet -->
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin=""/>
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
+
+    <!-- Chart.js -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+    <style>
+        body { background-color: #0f172a; color: #f8fafc; }
+        .glass-panel { background: rgba(30, 41, 59, 0.7); backdrop-filter: blur(10px); border: 1px solid rgba(255,255,255,0.05); }
+        .map-container { height: 300px; z-index: 1; border-radius: 0.5rem; overflow: hidden; }
+        .progress-bar-bg { background: #334155; border-radius: 9999px; height: 8px; overflow: hidden; }
+        .progress-bar-fill { background: linear-gradient(90deg, #3b82f6 0%, #10b981 100%); height: 100%; border-radius: 9999px; }
+        
+        /* Custom Scrollbar */
+        ::-webkit-scrollbar { width: 8px; }
+        ::-webkit-scrollbar-track { background: #0f172a; }
+        ::-webkit-scrollbar-thumb { background: #334155; border-radius: 4px; }
+        ::-webkit-scrollbar-thumb:hover { background: #475569; }
+    </style>
+</head>
+<body class="flex h-screen overflow-hidden antialiased selection:bg-brand-500 selection:text-white">
+
+    <!-- Sidebar -->
+    <aside class="w-64 bg-dark-900 border-r border-dark-700 flex flex-col hidden md:flex">
+        <div class="h-16 flex items-center px-6 border-b border-dark-700">
+            <i class="fa-solid fa-leaf text-brand-500 text-xl mr-3"></i>
+            <span class="text-lg font-bold tracking-wide text-white">PepperBot OS</span>
+        </div>
+        <nav class="flex-1 py-4 px-3 space-y-1 overflow-y-auto">
+            <a href="#" class="flex items-center px-3 py-2.5 bg-brand-600/10 text-brand-500 rounded-lg font-medium group transition-colors">
+                <i class="fa-solid fa-chart-pie w-5 mr-3"></i> Dashboard
+            </a>
+            <a href="#" class="flex items-center px-3 py-2.5 text-gray-400 hover:text-white hover:bg-dark-800 rounded-lg font-medium group transition-colors">
+                <i class="fa-solid fa-map-location-dot w-5 mr-3"></i> Farms & Plots
+            </a>
+            <a href="#" class="flex items-center px-3 py-2.5 text-gray-400 hover:text-white hover:bg-dark-800 rounded-lg font-medium group transition-colors">
+                <i class="fa-solid fa-satellite w-5 mr-3"></i> Earth Observation
+            </a>
+            <a href="#" class="flex items-center px-3 py-2.5 text-gray-400 hover:text-white hover:bg-dark-800 rounded-lg font-medium group transition-colors">
+                <i class="fa-solid fa-ship w-5 mr-3"></i> Logistics
+            </a>
+            <a href="#" class="flex items-center px-3 py-2.5 text-gray-400 hover:text-white hover:bg-dark-800 rounded-lg font-medium group transition-colors">
+                <i class="fa-solid fa-file-shield w-5 mr-3"></i> EUDR Compliance
+            </a>
+        </nav>
+        <div class="p-4 border-t border-dark-700">
+            <div class="flex items-center gap-3">
+                <img src="https://ui-avatars.com/api/?name=Mike+S&background=10b981&color=fff" class="w-8 h-8 rounded-full" alt="User">
+                <div class="text-sm">
+                    <p class="font-medium text-white">Mike S.</p>
+                    <p class="text-gray-500 text-xs">Agri-Director</p>
+                </div>
+            </div>
+        </div>
+    </aside>
+
+    <!-- Main Content -->
+    <main class="flex-1 flex flex-col h-screen overflow-y-auto bg-[#0a0f1c] relative">
+        <!-- Glow effect background -->
+        <div class="absolute top-0 left-1/2 -translate-x-1/2 w-full h-[500px] bg-brand-500/10 blur-[120px] pointer-events-none"></div>
+
+        <!-- Header -->
+        <header class="h-16 flex items-center justify-between px-8 border-b border-white/5 z-10 glass-panel sticky top-0">
+            <div class="flex items-center text-sm font-medium text-gray-400">
+                <span>Farms</span> <i class="fa-solid fa-chevron-right text-[10px] mx-3"></i> 
+                <span class="text-white">Espirito Santo Plot Alpha</span>
+            </div>
+            <div class="flex items-center gap-4">
+                <span class="px-3 py-1 bg-brand-500/20 border border-brand-500/30 text-brand-400 text-xs rounded-full flex items-center font-semibold">
+                    <i class="fa-solid fa-check-circle mr-1.5"></i> EUDR Verified (Clear)
+                </span>
+                <button class="text-gray-400 hover:text-white transition"><i class="fa-regular fa-bell"></i></button>
+            </div>
+        </header>
+
+        <!-- Dashboard Content -->
+        <div class="p-8 z-10 max-w-7xl mx-auto w-full space-y-6">
+            
+            <!-- KPIs row -->
+            <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
+                <div class="glass-panel p-5 rounded-xl border border-dark-700">
+                    <div class="flex justify-between items-start mb-2">
+                        <p class="text-gray-400 text-xs font-semibold uppercase tracking-wider">Canopy Health (NDVI)</p>
+                        <i class="fa-solid fa-leaf text-brand-500"></i>
+                    </div>
+                    <h3 class="text-3xl font-bold text-white mb-1">0.84</h3>
+                    <p class="text-xs text-brand-400"><i class="fa-solid fa-arrow-trend-up mr-1"></i> +0.02 from last month</p>
+                </div>
+                
+                <div class="glass-panel p-5 rounded-xl border border-dark-700">
+                    <div class="flex justify-between items-start mb-2">
+                        <p class="text-gray-400 text-xs font-semibold uppercase tracking-wider">Soil Moisture</p>
+                        <i class="fa-solid fa-droplet text-blue-400"></i>
+                    </div>
+                    <h3 class="text-3xl font-bold text-white mb-1">45.2%</h3>
+                    <p class="text-xs text-brand-400"><i class="fa-solid fa-check mr-1"></i> Optimal Range</p>
+                </div>
+
+                <div class="glass-panel p-5 rounded-xl border border-dark-700">
+                    <div class="flex justify-between items-start mb-2">
+                        <p class="text-gray-400 text-xs font-semibold uppercase tracking-wider">Est. Yield (Tons/Ha)</p>
+                        <i class="fa-solid fa-scale-balanced text-purple-400"></i>
+                    </div>
+                    <h3 class="text-3xl font-bold text-white mb-1">3.1</h3>
+                    <p class="text-xs text-brand-400"><i class="fa-solid fa-arrow-trend-up mr-1"></i> +12% YoY Projection</p>
+                </div>
+
+                <div class="glass-panel p-5 rounded-xl border border-dark-700">
+                    <div class="flex justify-between items-start mb-2">
+                        <p class="text-gray-400 text-xs font-semibold uppercase tracking-wider">Vine Age</p>
+                        <i class="fa-solid fa-seedling text-amber-400"></i>
+                    </div>
+                    <h3 class="text-3xl font-bold text-white mb-1">7 Yrs</h3>
+                    <p class="text-xs text-gray-400">Peak Production Phase</p>
+                </div>
+            </div>
+
+            <!-- Middle Row: Map & Traceability -->
+            <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                
+                <!-- Satellite Map -->
+                <div class="glass-panel rounded-xl border border-dark-700 lg:col-span-2 overflow-hidden flex flex-col">
+                    <div class="p-4 border-b border-white/5 flex justify-between items-center bg-dark-800/50">
+                        <h2 class="font-semibold text-white"><i class="fa-solid fa-satellite-dish text-brand-500 mr-2"></i> Spatial Analytics</h2>
+                        <div class="text-xs text-gray-400 bg-dark-900 px-2 py-1 rounded border border-dark-700">Lat: -18.981, Lng: -40.320</div>
+                    </div>
+                    <div id="map" class="map-container flex-1 min-h-[350px]"></div>
+                </div>
+
+                <!-- Traceability & Quality -->
+                <div class="glass-panel p-6 rounded-xl border border-dark-700 flex flex-col space-y-6">
+                    <div>
+                        <h2 class="font-semibold text-white mb-4"><i class="fa-solid fa-microscope text-brand-500 mr-2"></i> Quality Metrics</h2>
+                        <div class="space-y-4">
+                            <div>
+                                <div class="flex justify-between text-sm mb-1">
+                                    <span class="text-gray-300">Bulk Density</span>
+                                    <span class="font-bold text-white">565 g/l</span>
+                                </div>
+                                <div class="progress-bar-bg"><div class="progress-bar-fill" style="width: 95%"></div></div>
+                                <p class="text-[10px] text-gray-500 mt-1 text-right">Premium Grade TGSEB</p>
+                            </div>
+                            <div>
+                                <div class="flex justify-between text-sm mb-1">
+                                    <span class="text-gray-300">Piperine Content</span>
+                                    <span class="font-bold text-white">4.8%</span>
+                                </div>
+                                <div class="progress-bar-bg"><div class="progress-bar-fill" style="width: 85%; background: linear-gradient(90deg, #f59e0b 0%, #ef4444 100%);"></div></div>
+                            </div>
+                            <div>
+                                <div class="flex justify-between text-sm mb-1">
+                                    <span class="text-gray-300">Moisture Content</span>
+                                    <span class="font-bold text-white">11.2%</span>
+                                </div>
+                                <div class="progress-bar-bg"><div class="progress-bar-fill" style="width: 40%; background: linear-gradient(90deg, #3b82f6 0%, #60a5fa 100%);"></div></div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="pt-4 border-t border-white/5 flex gap-4 items-center">
+                        <div class="bg-white p-2 rounded-lg">
+                            <img src="https://api.qrserver.com/v1/create-qr-code/?size=100x100&data=https://github.com/mike-hy-sylva/pepperbot" alt="QR Code" class="w-16 h-16 object-contain">
+                        </div>
+                        <div>
+                            <h3 class="text-sm font-semibold text-white">Provenance Scan</h3>
+                            <p class="text-xs text-gray-400 mt-1">Scan to view immutable origin block, GIS data, and EUDR certificate.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Bottom Row: Chart & Logistics -->
+            <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                <!-- Chart -->
+                <div class="glass-panel p-6 rounded-xl border border-dark-700 lg:col-span-2">
+                    <div class="flex justify-between items-center mb-4">
+                        <h2 class="font-semibold text-white"><i class="fa-solid fa-chart-line text-brand-500 mr-2"></i> NDVI Historical Trend</h2>
+                        <select class="bg-dark-900 border border-dark-700 text-xs text-gray-300 rounded px-2 py-1 outline-none">
+                            <option>Last 12 Months</option>
+                            <option>YTD</option>
+                        </select>
+                    </div>
+                    <div class="h-[200px] w-full">
+                        <canvas id="ndviChart"></canvas>
+                    </div>
+                </div>
+
+                <!-- Logistics Container -->
+                <div class="glass-panel p-6 rounded-xl border border-brand-500/30 bg-gradient-to-b from-dark-800/80 to-dark-900/80 relative overflow-hidden group">
+                    <div class="absolute -right-4 -top-4 opacity-10 text-brand-500 transform rotate-12 transition-transform group-hover:scale-110">
+                        <i class="fa-solid fa-box text-9xl"></i>
+                    </div>
+                    <div class="relative z-10 h-full flex flex-col justify-between">
+                        <div>
+                            <span class="inline-block px-2 py-1 bg-blue-500/20 text-blue-400 text-[10px] font-bold uppercase rounded mb-2 border border-blue-500/20">Logistics</span>
+                            <h2 class="text-xl font-bold text-white mb-1">Join Shipment #BR-RT-892</h2>
+                            <p class="text-sm text-gray-400 mb-6">Consolidated 20ft Container &bull; Vitoria Port to Rotterdam</p>
+                            
+                            <div class="mb-2 flex justify-between text-sm font-medium">
+                                <span class="text-gray-300">Container Capacity</span>
+                                <span class="text-brand-400">75% Full</span>
+                            </div>
+                            <div class="w-full bg-dark-900 rounded-full h-3 mb-1 border border-dark-700 overflow-hidden relative">
+                                <div class="bg-brand-500 h-3 rounded-full relative" style="width: 75%">
+                                    <div class="absolute right-0 top-0 bottom-0 w-8 bg-white/20 animate-pulse"></div>
+                                </div>
+                            </div>
+                            <div class="flex justify-between text-[10px] text-gray-500">
+                                <span>0 Tons</span>
+                                <span>18 / 24 Tons Booked</span>
+                            </div>
+                        </div>
+                        
+                        <button class="w-full mt-6 bg-brand-600 hover:bg-brand-500 text-white font-medium py-3 rounded-lg transition-colors shadow-[0_0_15px_rgba(16,185,129,0.3)] hover:shadow-[0_0_25px_rgba(16,185,129,0.5)]">
+                            Reserve Remaining Space
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </main>
+
+    <script>
+        // LEAFLET MAP INITIALIZATION
+        // Using an actual location in Espirito Santo, Brazil
+        var map = L.map('map', { zoomControl: false }).setView([-18.981, -40.320], 14);
+        
+        // Esri Satellite
+        L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}', {
+            maxZoom: 18,
+            attribution: 'Esri'
+        }).addTo(map);
+
+        // Add a realistic-looking farm polygon instead of just a marker
+        var latlngs = [
+            [-18.975, -40.325],
+            [-18.975, -40.315],
+            [-18.985, -40.315],
+            [-18.988, -40.322],
+            [-18.980, -40.328]
+        ];
+        var polygon = L.polygon(latlngs, {
+            color: '#10b981',
+            fillColor: '#10b981',
+            fillOpacity: 0.2,
+            weight: 2
+        }).addTo(map);
+        
+        // Add a central marker with custom HTML popup
+        var centerMarker = L.marker([-18.981, -40.320]).addTo(map);
+        centerMarker.bindPopup(`
+            <div style="background:#1e293b; color:white; padding:8px; border-radius:4px; font-family:Inter;">
+                <b style="color:#10b981;">Plot Alpha</b><br/>
+                Area: 142 Ha<br/>
+                Status: Active
+            </div>
+        `, {className: 'dark-popup'});
+
+        // CHART.JS INITIALIZATION
+        const ctx = document.getElementById('ndviChart').getContext('2d');
+        
+        // Create gradient
+        let gradient = ctx.createLinearGradient(0, 0, 0, 400);
+        gradient.addColorStop(0, 'rgba(16, 185, 129, 0.5)');   
+        gradient.addColorStop(1, 'rgba(16, 185, 129, 0.0)');
+
+        new Chart(ctx, {
+            type: 'line',
+            data: {
+                labels: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'],
+                datasets: [{
+                    label: 'NDVI Index',
+                    data: [0.65, 0.68, 0.71, 0.75, 0.80, 0.82, 0.84, 0.83, 0.81, 0.78, 0.74, 0.70],
+                    borderColor: '#10b981',
+                    backgroundColor: gradient,
+                    borderWidth: 2,
+                    pointBackgroundColor: '#0f172a',
+                    pointBorderColor: '#10b981',
+                    pointBorderWidth: 2,
+                    pointRadius: 4,
+                    fill: true,
+                    tension: 0.4
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: { display: false }
+                },
+                scales: {
+                    y: {
+                        beginAtZero: false,
+                        min: 0.5,
+                        max: 1.0,
+                        grid: { color: 'rgba(255, 255, 255, 0.05)' },
+                        ticks: { color: '#94a3b8' }
+                    },
+                    x: {
+                        grid: { display: false },
+                        ticks: { color: '#94a3b8' }
+                    }
+                }
+            }
+        });
+    </script>
+</body>
+</html>
